@@ -51,18 +51,12 @@ This project is intentionally simple and can be hosted almost anywhere as a stat
 
 Because this is a standalone HTML app, there is no build step.
 
-### Option 1: Open locally
+### Open locally
 
 * Download or clone the repository
 * Keep `audiobook_wrapped.html` and `Audiobook Tracking.xlsx` together if you want to ship the sample template with the project
 * Open `audiobook_wrapped.html` in your browser
 
-### Option 2: Host on GitHub Pages
-
-* Push the file to a GitHub repository
-* Enable GitHub Pages for the repository
-* Set the published source to the branch/folder where `audiobook_wrapped.html` lives
-* Open the published site URL
 
 ## Included Template Workbook
 
@@ -99,7 +93,7 @@ The `2026 Data` sheet already includes the fields the app expects, including:
 
 ## Expected Input Data
 
-The app reads one worksheet at a time and looks for audiobook-related columns. Column matching is case-insensitive for the supported field names.
+The app reads one worksheet at a time and looks for audiobook-related columns. Column matching is case-insensitive for the supported field names. The highlighted fields are required for full use of application
 
 ### Supported columns
 
@@ -194,14 +188,4 @@ To adjust the visual style, update the variables inside the `:root` and `[data-t
 * No server required
 * Easy to fork, customize, and publish
 
-## Suggested Repository Settings
 
-If you are uploading this to GitHub, a clean repo setup would be:
-
-* Repository name: `audiobook-wrapped`
-* Description: `A single-file web app that turns audiobook spreadsheet data into a beautiful wrapped-style dashboard.`
-* Topics: `html`, `javascript`, `xlsx`, `sheetjs`, `audiobooks`, `dashboard`, `github-pages`
-
-## License
-
-Choose the license that fits how you want to share the project. If you want broad reuse, MIT is a good default.
