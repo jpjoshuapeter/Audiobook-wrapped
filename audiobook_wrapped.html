@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audiobook Wrapped</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎧</text></svg>">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root {
+    --bg: #f0e3d2;
+    --bg2: #b6b19e;
+    --bg3: #c5a491;
+    --card: #f0e3d2;
+    --border: rgba(117,112,71,0.24);
+    --text: #4e3424;
+    --muted: rgba(78,52,36,0.72);
+    --hint: rgba(117,112,71,0.82);
+    --purple: #a46e42;
+    --purple-soft: rgba(164,110,66,0.12);
+    --teal: #757047;
+    --teal-soft: rgba(117,112,71,0.12);
+    --coral: #c5a491;
+    --coral-soft: rgba(197,164,145,0.18);
+    --amber: #a46e42;
+    --amber-soft: rgba(164,110,66,0.14);
+    --blue: #757047;
+    --blue-soft: rgba(117,112,71,0.12);
+    --pink: #b6b19e;
+    --pink-soft: rgba(182,177,158,0.18);
+    --hero-bg: linear-gradient(145deg, #f0e3d2 0%, #c5a491 50%, #a46e42 100%);
+    --hero-text: #4e3424;
+    --hero-sub: rgba(78,52,36,0.74);
+    --source-track: rgba(78,52,36,0.08);
+    --bar-track: rgba(78,52,36,0.08);
+    --toggle-bg: #b6b19e;
+    --toggle-knob: #f0e3d2;
+    --input-bg: #f0e3d2;
+    --input-text: #4e3424;
+    --on-accent: #f0e3d2;
+    --danger-soft: rgba(164,110,66,0.12);
+    --danger-border: rgba(164,110,66,0.28);
+    --danger-text: #a46e42;
+    --hero-orb-1: rgba(164,110,66,0.12);
+    --hero-orb-2: rgba(117,112,71,0.1);
+    --upload-border: rgba(164,110,66,0.38);
+    --upload-hover-bg: rgba(164,110,66,0.18);
+    --reload-border: rgba(164,110,66,0.34);
+    --reload-hover: rgba(164,110,66,0.18);
+    --shadow: 0 1px 3px rgba(78,52,36,0.18);
+    --accent-1: #a46e42;
+    --accent-1-soft: rgba(164,110,66,0.16);
+    --accent-2: #757047;
+    --accent-2-soft: rgba(117,112,71,0.16);
+    --accent-3: #c5a491;
+    --accent-3-soft: rgba(197,164,145,0.22);
+    --accent-4: #4e3424;
+    --accent-4-soft: rgba(78,52,36,0.12);
+    --accent-5: #b6b19e;
+    --accent-5-soft: rgba(182,177,158,0.2);
+    --accent-6: #a46e42;
+    --accent-6-soft: rgba(164,110,66,0.14);
+    --accent-7: #757047;
+    --accent-7-soft: rgba(117,112,71,0.14);
+    --accent-8: #c5a491;
+    --accent-8-soft: rgba(197,164,145,0.18);
+  }
+
+  [data-theme="dark"] {
+    --bg: #152013;
+    --bg2: #240502;
+    --bg3: #3d3236;
+    --card: #3d3236;
+    --border: rgba(240,227,210,0.12);
+    --text: #f0e3d2;
+    --muted: rgba(240,227,210,0.72);
+    --hint: rgba(197,164,145,0.72);
+    --purple: #c5a491;
+    --purple-soft: rgba(197,164,145,0.12);
+    --teal: #b6b19e;
+    --teal-soft: rgba(182,177,158,0.12);
+    --coral: #a46e42;
+    --coral-soft: rgba(164,110,66,0.16);
+    --amber: #757047;
+    --amber-soft: rgba(117,112,71,0.18);
+    --blue: #f0e3d2;
+    --blue-soft: rgba(240,227,210,0.12);
+    --pink: #c5a491;
+    --pink-soft: rgba(197,164,145,0.14);
+    --hero-bg: linear-gradient(145deg, #240502 0%, #4e3424 48%, #0A1344 100%);
+    --hero-text: #f0e3d2;
+    --hero-sub: rgba(240,227,210,0.72);
+    --source-track: rgba(240,227,210,0.08);
+    --bar-track: rgba(240,227,210,0.08);
+    --toggle-bg: #4e3424;
+    --toggle-knob: #f0e3d2;
+    --input-bg: #240502;
+    --input-text: #f0e3d2;
+    --on-accent: #152013;
+    --danger-soft: rgba(197,164,145,0.12);
+    --danger-border: rgba(197,164,145,0.26);
+    --danger-text: #f0e3d2;
+    --hero-orb-1: rgba(78,52,36,0.36);
+    --hero-orb-2: rgba(10,19,68,0.34);
+    --upload-border: rgba(197,164,145,0.34);
+    --upload-hover-bg: rgba(197,164,145,0.18);
+    --reload-border: rgba(197,164,145,0.3);
+    --reload-hover: rgba(197,164,145,0.2);
+    --shadow: 0 1px 3px rgba(0,0,0,0.32);
+    --accent-1: #c5a491;
+    --accent-1-soft: rgba(197,164,145,0.2);
+    --accent-2: #b6b19e;
+    --accent-2-soft: rgba(182,177,158,0.18);
+    --accent-3: #a46e42;
+    --accent-3-soft: rgba(164,110,66,0.2);
+    --accent-4: #f0e3d2;
+    --accent-4-soft: rgba(240,227,210,0.12);
+    --accent-5: #757047;
+    --accent-5-soft: rgba(117,112,71,0.2);
+    --accent-6: #c5a491;
+    --accent-6-soft: rgba(197,164,145,0.16);
+    --accent-7: #b6b19e;
+    --accent-7-soft: rgba(182,177,158,0.16);
+    --accent-8: #a46e42;
+    --accent-8-soft: rgba(164,110,66,0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  /* ── Upload zone ─────────────────────────────── */
+  .upload-zone {
+    border: 1.5px dashed var(--upload-border);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 2rem;
+    background: var(--purple-soft);
+  }
+  .upload-zone:hover, .upload-zone.drag { border-color: var(--purple); background: var(--upload-hover-bg); }
+  .upload-zone input { display: none; }
+  .upload-icon { font-size: 32px; margin-bottom: 0.75rem; }
+  .upload-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
+  .upload-sub { font-size: 13px; color: var(--muted); }
+  .upload-sub strong { color: var(--purple); }
+  .upload-btn {
+    display: inline-block;
+    margin-top: 1.2rem;
+    padding: 8px 20px;
+    border-radius: 8px;
+    background: var(--purple);
+    color: var(--on-accent);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+  }
+
+  .sheet-select {
+    display: none;
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    align-items: center;
+    gap: 12px;
+  }
+  .sheet-select label { font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .sheet-select select {
+    flex: 1;
+    background: var(--input-bg);
+    color: var(--input-text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+  }
+  .sheet-select button {
+    padding: 7px 16px;
+    background: var(--purple);
+    color: var(--on-accent);
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .error-msg {
+    display: none;
+    background: var(--danger-soft);
+    border: 1px solid var(--danger-border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 13px;
+    color: var(--danger-text);
+    margin-bottom: 1.5rem;
+  }
+
+  /* ── Wrapped content ─────────────────────────── */
+  #wrapped { display: none; }
+
+  .hero {
+    border-radius: 20px;
+    padding: 3rem 2rem 2.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    background: var(--hero-bg);
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: var(--hero-orb-1);
+    top: -80px; left: -80px;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    width: 350px; height: 350px;
+    border-radius: 50%;
+    background: var(--hero-orb-2);
+    bottom: -120px; right: -100px;
+  }
+  .hero-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--hero-sub);
+    margin-bottom: 0.6rem;
+  }
+  .hero-title {
+    font-size: 52px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--hero-text);
+    letter-spacing: -1px;
+    margin-bottom: 0.3rem;
+  }
+  .hero-title span { color: var(--purple); }
+  .hero-sub { font-size: 14px; color: var(--hero-sub); }
+
+  /* ── Stat cards ──────────────────────────────── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 580px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem;
+  }
+  .stat-emoji { font-size: 20px; margin-bottom: 6px; }
+  .stat-val { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; margin-bottom: 4px; }
+  .stat-label { font-size: 11px; color: var(--muted); }
+
+  /* ── Section ─────────────────────────────────── */
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 1.4rem;
+    margin-bottom: 1.2rem;
+  }
+  .section-head {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--hint);
+    margin-bottom: 1rem;
+  }
+
+  /* ── Author rows ─────────────────────────────── */
+  .author-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .author-row:last-child { border-bottom: none; }
+  .rank { font-size: 12px; font-weight: 600; color: var(--hint); min-width: 20px; }
+  .avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .author-info { flex: 1; min-width: 0; }
+  .author-name { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .author-detail { font-size: 11px; color: var(--muted); }
+  .bar-col { width: 110px; flex-shrink: 0; }
+  .bar-track { height: 4px; background: var(--bar-track); border-radius: 2px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 2px; }
+  .bar-label { font-size: 10px; color: var(--hint); text-align: right; margin-top: 3px; }
+
+  /* ── Notable books grid ──────────────────────── */
+  .books-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .book-card {
+    background: var(--bg3);
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid var(--border);
+  }
+  .book-badge {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  .book-title-text { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; line-height: 1.3; }
+  .book-author-text { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .book-stat { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1; }
+  .book-stat-label { font-size: 10px; color: var(--hint); }
+
+  /* ── Source bars ─────────────────────────────── */
+  .source-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .source-row:last-child { border-bottom: none; }
+  .source-name { font-size: 14px; font-weight: 500; min-width: 70px; }
+  .source-track { flex: 1; height: 6px; background: var(--source-track); border-radius: 3px; overflow: hidden; }
+  .source-fill { height: 100%; border-radius: 3px; }
+  .source-meta { font-size: 12px; color: var(--muted); white-space: nowrap; min-width: 80px; text-align: right; }
+
+  /* ── Monthly breakdown ───────────────────────── */
+  .month-block { margin-bottom: 1rem; }
+  .month-label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--hint); margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tl-row {
+    display: flex; align-items: flex-start;
+    gap: 10px; padding: 5px 0;
+    font-size: 12px;
+  }
+  .tl-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+  .tl-title { font-weight: 500; color: var(--text); }
+  .tl-meta { color: var(--muted); font-size: 11px; margin-top: 1px; }
+
+  /* ── Reload button ───────────────────────────── */
+  .reload-btn {
+    display: block;
+    width: 100%;
+    margin-top: 1.5rem;
+    padding: 12px;
+    background: var(--purple-soft);
+    border: 1px solid var(--reload-border);
+    border-radius: 12px;
+    color: var(--purple);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    letter-spacing: 0.04em;
+  }
+  .reload-btn:hover { background: var(--reload-hover); }
+
+  /* ── Theme toggle ────────────────────────────── */
+  body { transition: background 0.3s, color 0.3s; }
+  .section, .stat-card, .book-card, .upload-zone, .sheet-select { transition: background 0.3s, border-color 0.3s; }
+
+  .theme-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 2rem;
+    padding: 1rem;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .toggle-track {
+    width: 44px; height: 24px;
+    border-radius: 12px;
+    background: var(--toggle-bg);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+    flex-shrink: 0;
+    border: none;
+    outline: none;
+  }
+
+  .toggle-track::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--toggle-knob);
+    top: 3px; left: 3px;
+    transition: transform 0.25s cubic-bezier(.4,0,.2,1);
+    box-shadow: var(--shadow);
+  }
+
+  [data-theme="dark"] .toggle-track::after {
+    transform: translateX(20px);
+  }
+
+  .toggle-label { user-select: none; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Upload zone -->
+  <div class="upload-zone" id="dropZone">
+    <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
+    <div class="upload-icon">📖</div>
+    <div class="upload-title">Drop your audiobook tracker here</div>
+    <div class="upload-sub">Supports <strong>.xlsx</strong> · Select the sheet with your data</div>
+    <button class="upload-btn" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">Choose file</button>
+  </div>
+
+  <!-- Sheet picker (shows after file load) -->
+  <div class="sheet-select" id="sheetSelect">
+    <label>Sheet:</label>
+    <select id="sheetPicker"></select>
+    <button onclick="renderFromSheet()">Load Wrapped</button>
+  </div>
+
+  <div class="error-msg" id="errorMsg"></div>
+
+  <!-- Wrapped output -->
+  <div id="wrapped"></div>
+
+  <!-- Theme toggle (always visible) -->
+  <div class="theme-bar" id="themeBar">
+    <span class="toggle-label">☀️</span>
+    <button class="toggle-track" id="themeToggle" aria-label="Toggle dark mode" onclick="toggleTheme()"></button>
+    <span class="toggle-label">🌙</span>
+  </div>
+
+</div>
+
+<script>
+// ── Theme ────────────────────────────────────────
+const saved = localStorage.getItem('ab-theme');
+if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  if (isDark) {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('ab-theme', 'light');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('ab-theme', 'dark');
+  }
+}
+
+let workbook = null;
+
+const AVATAR_COLORS = [
+  { bg:'var(--accent-1-soft)', color:'var(--accent-1)' },
+  { bg:'var(--accent-2-soft)', color:'var(--accent-2)' },
+  { bg:'var(--accent-3-soft)', color:'var(--accent-3)' },
+  { bg:'var(--accent-4-soft)', color:'var(--accent-4)' },
+  { bg:'var(--accent-5-soft)', color:'var(--accent-5)' },
+  { bg:'var(--accent-6-soft)', color:'var(--accent-6)' },
+  { bg:'var(--accent-7-soft)', color:'var(--accent-7)' },
+  { bg:'var(--accent-8-soft)', color:'var(--accent-8)' },
+];
+
+// ── File handling ───────────────────────────────
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag');
+  handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+function handleFile(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      workbook = XLSX.read(e.target.result, { type: 'array', cellDates: true });
+      populateSheetPicker();
+    } catch(err) {
+      showError('Could not read file: ' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+
+
+function populateSheetPicker() {
+  const picker = document.getElementById('sheetPicker');
+  picker.innerHTML = '';
+
+  // Index of the tab that was active when the file was saved (default to 0)
+  const activeTab =
+    (workbook.Workbook &&
+     workbook.Workbook.WBView &&
+     workbook.Workbook.WBView[0] &&
+     workbook.Workbook.WBView[0].activeTab) || 0;
+
+  workbook.SheetNames.forEach((name, i) => {
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.text = name;
+    if (i === activeTab) opt.selected = true;   // select the saved tab
+    picker.appendChild(opt);
+  });
+
+  document.getElementById('sheetSelect').style.display = 'flex';
+  renderFromSheet();
+}
+
+
+
+function renderFromSheet() {
+  const sheetName = document.getElementById('sheetPicker').value;
+  const sheet = workbook.Sheets[sheetName];
+  const raw = XLSX.utils.sheet_to_json(sheet, { raw: false, defval: '' });
+  if (!raw.length) { showError('No data found in sheet "' + sheetName + '"'); return; }
+  hideError();
+  buildWrapped(raw);
+  const year = yearFromSheetName(sheetName);
+  if (year) document.getElementById('heroYear').textContent = year;
+}
+
+function yearFromSheetName(name){
+  const match = (name||'').match(/(20\d{2})/);
+  return match ? match[1]:'';
+}
+
+// ── Data parsing ────────────────────────────────
+function parseMinutes(row) {
+  // Try "Mins" column variants first
+  for (const key of Object.keys(row)) {
+    if (key.toLowerCase().trim() === 'mins') {
+      const v = parseFloat(row[key]);
+      if (!isNaN(v) && v > 0) return v;
+    }
+  }
+  // Fall back: parse Hours string "HH:MM" or decimal
+  for (const key of Object.keys(row)) {
+    if (key.toLowerCase().includes('hour')) {
+      const val = row[key];
+      if (typeof val === 'string' && val.includes(':')) {
+        const [h, m] = val.split(':').map(Number);
+        return h * 60 + (m || 0);
+      }
+      const v = parseFloat(val);
+      if (!isNaN(v)) return v * 60;
+    }
+  }
+  return 0;
+}
+
+function getCol(row, ...names) {
+  for (const n of names) {
+    for (const k of Object.keys(row)) {
+      if (k.toLowerCase().trim() === n.toLowerCase()) return row[k];
+    }
+  }
+  return '';
+}
+
+function parseRows(raw) {
+  return raw.map(r => ({
+    title:   getCol(r, 'title') || '',
+    author:  getCol(r, 'author') || '',
+    mins:    parseMinutes(r),
+    days:    parseInt(getCol(r, 'num of days', 'days')) || 0,
+    avgMin:  parseFloat(getCol(r, 'avg min / day', 'avg min/day')) || 0,
+    source:  (getCol(r, 'source') || '').trim(),
+    start:   getCol(r, 'start date', 'start') || '',
+    end:     getCol(r, 'end date', 'end') || '',
+    number:  parseFloat(getCol(r, 'number')) || 0,
+  })).filter(r => r.title && r.mins > 0);
+}
+
+function fmtDate(d) {
+  if (!d) return '';
+  const s = typeof d === 'string' ? d : String(d);
+  const dt = new Date(s);
+  if (isNaN(dt)) return s.slice(0,10);
+  return dt.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+}
+
+function monthOf(d) {
+  if (!d) return 'Unknown';
+  const dt = new Date(d);
+  if (isNaN(dt)) return 'Unknown';
+  return dt.toLocaleDateString('en-US', { month:'long', year:'numeric' });
+}
+
+function initials(name) {
+  return name.split(' ').filter(Boolean).map(w => w[0]).slice(0,2).join('').toUpperCase();
+}
+
+// ── Build Wrapped ───────────────────────────────
+function buildWrapped(raw) {
+  const books = parseRows(raw);
+  if (!books.length) { showError('No valid rows found. Check your column names (Title, Author, Mins, Source, etc.)'); return; }
+
+  // ── Aggregate stats
+  const totalMins = books.reduce((s,b) => s + b.mins, 0);
+  const totalHours = Math.round(totalMins / 60);
+  const totalBooks = books.length;
+
+  const authorMap = {};
+  books.forEach(b => {
+    if (!authorMap[b.author]) authorMap[b.author] = { books: 0, mins: 0 };
+    authorMap[b.author].books++;
+    authorMap[b.author].mins += b.mins;
+  });
+  const topAuthors = Object.entries(authorMap).sort((a,b) => b[1].mins - a[1].mins);
+  const uniqueAuthors = topAuthors.length;
+
+  const longest  = [...books].sort((a,b) => b.mins - a.mins)[0];
+  const shortest = [...books].sort((a,b) => a.mins - b.mins)[0];
+  const fastest  = [...books].filter(b=>b.days>0).sort((a,b) => b.avgMin - a.avgMin)[0];
+  const slowest  = [...books].filter(b=>b.days>0).sort((a,b) => a.avgMin - b.avgMin)[0];
+  const bestDay  = Math.round(Math.max(...books.filter(b=>b.days>0).map(b=>b.avgMin)));
+
+  const sourceMap = {};
+  books.forEach(b => {
+    const s = b.source || 'Unknown';
+    if (!sourceMap[s]) sourceMap[s] = 0;
+    sourceMap[s]++;
+  });
+
+  // ── Monthly grouping
+  const monthMap = {};
+  books.forEach(b => {
+    const m = monthOf(b.start);
+    if (!monthMap[m]) monthMap[m] = [];
+    monthMap[m].push(b);
+  });
+
+  // ── Date range label
+  const starts = books.map(b => new Date(b.start)).filter(d => !isNaN(d));
+  const ends   = books.map(b => new Date(b.end)).filter(d => !isNaN(d));
+  let rangeLabel = totalBooks + ' books';
+  if (starts.length && ends.length) {
+    const minD = new Date(Math.min(...starts));
+    const maxD = new Date(Math.max(...ends));
+    rangeLabel += ' · ' + minD.toLocaleDateString('en-US',{month:'short',year:'numeric'}) + ' – ' + maxD.toLocaleDateString('en-US',{month:'short',year:'numeric'});
+  }
+
+  // ── HTML
+  const maxAuthorMins = topAuthors[0]?.[1].mins || 1;
+  const DOT_COLORS = ['var(--accent-1)','var(--accent-2)','var(--accent-3)','var(--accent-4)','var(--accent-5)','var(--accent-6)','var(--accent-7)','var(--accent-8)'];
+  const SOURCE_COLORS = ['var(--accent-1)','var(--accent-2)','var(--accent-3)','var(--accent-4)','var(--accent-5)'];
+
+  const authorsHTML = topAuthors.slice(0,6).map(([name, data], i) => {
+    const ac = AVATAR_COLORS[i % AVATAR_COLORS.length];
+    const pct = Math.round((data.mins / maxAuthorMins) * 100);
+    const hrs = (data.mins / 60).toFixed(1);
+    return `
+      <div class="author-row">
+        <span class="rank">#${i+1}</span>
+        <div class="avatar" style="background:${ac.bg};color:${ac.color}">${initials(name)}</div>
+        <div class="author-info">
+          <div class="author-name">${name}</div>
+          <div class="author-detail">${data.books} book${data.books>1?'s':''}</div>
+        </div>
+        <div class="bar-col">
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${ac.color}"></div></div>
+          <div class="bar-label">${Math.round(data.mins).toLocaleString()} min</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  function bookCard(badge, badgeBg, badgeColor, book, statVal, statLabel) {
+    return `<div class="book-card">
+      <span class="book-badge" style="background:${badgeBg};color:${badgeColor}">${badge}</span>
+      <div class="book-title-text">${book.title}</div>
+      <div class="book-author-text">${book.author}</div>
+      <div class="book-stat">${statVal}</div>
+      <div class="book-stat-label">${statLabel}</div>
+    </div>`;
+  }
+
+  const totalSourceCount = Object.values(sourceMap).reduce((a,b)=>a+b,0);
+  const sourcesHTML = Object.entries(sourceMap).sort((a,b)=>b[1]-a[1]).map(([name, count], i) => {
+    const pct = Math.round((count / totalSourceCount) * 100);
+    return `<div class="source-row">
+      <span class="source-name">${name}</span>
+      <div class="source-track"><div class="source-fill" style="width:${pct}%;background:${SOURCE_COLORS[i%SOURCE_COLORS.length]}"></div></div>
+      <span class="source-meta">${count} book${count>1?'s':''} · ${pct}%</span>
+    </div>`;
+  }).join('');
+
+const monthHTML = Object.entries(monthMap).map(([month, mbooks]) => {
+    const monthMins = Math.round(mbooks.reduce((s,b) => s + b.mins, 0));
+    const monthHrs = (monthMins / 60).toFixed(1);
+    const rows = mbooks.map((b,i) => `
+      <div class="tl-row">
+        <div class="tl-dot" style="background:${DOT_COLORS[i%DOT_COLORS.length]}"></div>
+        <div>
+          <div class="tl-title">${b.title}</div>
+          <div class="tl-meta">${fmtDate(b.start)} – ${fmtDate(b.end)} · ${Math.round(b.mins).toLocaleString()} min</div>
+        </div>
+      </div>`).join('');
+    return `<div class="month-block">
+      <div class="month-label" style="display:flex;justify-content:space-between;align-items:baseline;">
+        <span>${month}</span>
+        <span style="font-weight:400;letter-spacing:0;text-transform:none;font-size:11px;color:var(--muted)">${monthMins.toLocaleString()} min · ${monthHrs} hrs</span>
+      </div>
+      ${rows}
+    </div>`;
+  }).join('');
+
+
+
+  document.getElementById('wrapped').innerHTML = `
+    <div class="hero">
+      <div class="hero-eyebrow">Your year in audiobooks</div>
+      <div class="hero-title"><span id="heroYear">2026</span><br>Audio<span>book</span><br>Wrapped</div>
+      <div class="hero-sub">${rangeLabel}</div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-emoji">🎧</div><div class="stat-val">${totalHours.toLocaleString()}</div><div class="stat-label">Hours listened</div></div>
+      <div class="stat-card"><div class="stat-emoji">📚</div><div class="stat-val">${totalBooks}</div><div class="stat-label">Books finished</div></div>
+      <div class="stat-card"><div class="stat-emoji">✍️</div><div class="stat-val">${uniqueAuthors}</div><div class="stat-label">Unique authors</div></div>
+      <div class="stat-card"><div class="stat-emoji">⚡</div><div class="stat-val">${bestDay}</div><div class="stat-label">Best min/day</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">Top authors</div>
+      ${authorsHTML}
+    </div>
+
+    <div class="section">
+      <div class="section-head">Notable books</div>
+      <div class="books-grid">
+        ${bookCard('Longest','var(--accent-1-soft)','var(--accent-1)', longest, (longest.mins/60).toFixed(1)+' hrs', 'listening time')}
+        ${bookCard('Shortest','var(--accent-2-soft)','var(--accent-2)', shortest, (shortest.mins/60).toFixed(1)+' hrs', 'listening time')}
+        ${fastest ? bookCard('Fastest pace','var(--accent-5-soft)','var(--accent-5)', fastest, Math.round(fastest.avgMin)+' min/day', 'average daily listening') : ''}
+        ${slowest && slowest.title !== fastest?.title ? bookCard('Most leisurely','var(--accent-3-soft)','var(--accent-3)', slowest, Math.round(slowest.avgMin)+' min/day', 'average daily listening') : ''}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">Listening sources</div>
+      ${sourcesHTML}
+    </div>
+
+    <div class="section">
+      <div class="section-head">Reading timeline</div>
+      ${monthHTML}
+    </div>
+
+    <button class="reload-btn" onclick="document.getElementById('fileInput').click()">↑ Load a different file</button>
+  `;
+
+  document.getElementById('wrapped').style.display = 'block';
+  document.getElementById('dropZone').style.display = 'none';
+  document.getElementById('sheetSelect').style.display = 'none';
+}
+
+function showError(msg) { const e = document.getElementById('errorMsg'); e.textContent = msg; e.style.display = 'block'; }
+function hideError() { document.getElementById('errorMsg').style.display = 'none'; }
+</script>
+</body>
+</html>
