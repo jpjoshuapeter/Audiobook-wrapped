@@ -34,6 +34,7 @@ Once a valid spreadsheet is loaded, the app builds a “Wrapped” style dashboa
 * HTML5
 * CSS3
 * Vanilla JavaScript
+* .xlsx
 
 
 ## Project Structure
